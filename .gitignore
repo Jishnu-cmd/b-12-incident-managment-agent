@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+.venv/
+env/
+venv/
+ENV/
+
+# Build outputs
+dist/
+frontend/dist/
+build/
+*.egg-info/
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+backend/__pycache__/
+backend/app/__pycache__/
+backend/app/agents/__pycache__/
+backend/app/api/__pycache__/
+backend/app/core/__pycache__/
+backend/app/models/__pycache__/
+backend/app/schemas/__pycache__/
+backend/app/rag/__pycache__/
+mcp-server/__pycache__/
+remediation/__pycache__/
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs and Environment
+*.log
+.env
+.env.local
+.vscode/
+.idea/
+.DS_Store

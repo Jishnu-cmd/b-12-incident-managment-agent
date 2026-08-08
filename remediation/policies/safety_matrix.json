@@ -1,0 +1,28 @@
+{
+  "tools": {
+    "restart_service": {
+      "risk_level": "Low",
+      "allowed_roles": ["Admin", "Incident Manager", "Engineer", "Service Desk"],
+      "requires_human_approval_below": 90.0,
+      "max_timeout_seconds": 30
+    },
+    "clear_cache": {
+      "risk_level": "Medium",
+      "allowed_roles": ["Admin", "Incident Manager", "Engineer"],
+      "requires_human_approval_below": 90.0,
+      "max_timeout_seconds": 15
+    },
+    "scale_container": {
+      "risk_level": "Medium",
+      "allowed_roles": ["Admin", "Incident Manager", "Engineer"],
+      "requires_human_approval_below": 95.0,
+      "max_timeout_seconds": 60
+    },
+    "verify_health": {
+      "risk_level": "Low",
+      "allowed_roles": ["Admin", "Incident Manager", "Engineer", "Service Desk", "Viewer"],
+      "requires_human_approval_below": 0.0,
+      "max_timeout_seconds": 10
+    }
+  }
+}
