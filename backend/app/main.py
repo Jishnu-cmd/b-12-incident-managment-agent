@@ -14,7 +14,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.core.database import engine, Base
-from app.api import incidents, knowledge, copilot, evaluation, tools_router
+from app.api import incidents, knowledge, copilot, evaluation, tools_router, auth
 
 # Create database tables automatically
 Base.metadata.create_all(bind=engine)
@@ -35,6 +35,7 @@ app.add_middleware(
 )
 
 # Mount Routers
+app.include_router(auth.router, prefix=settings.API_V1_STR)
 app.include_router(incidents.router, prefix=settings.API_V1_STR)
 app.include_router(knowledge.router, prefix=settings.API_V1_STR)
 app.include_router(copilot.router, prefix=settings.API_V1_STR)
@@ -52,4 +53,4 @@ def root():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("app.main:app", host="127.0.0.1", port=8005, reload=True)
+    uvicorn.run("app.main:app", host="127.0.0.1", port=8008, reload=True)

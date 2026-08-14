@@ -10,7 +10,32 @@ const client = axios.create({
   },
 });
 
+// Interceptor to attach JWT token if present
+client.interceptors.request.use((config) => {
+  const token = localStorage.getItem('aetherpay_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 export const api = {
+  // Auth API
+  login: async (email: string, password: string) => {
+    const res = await client.post<{ access_token: string; token_type: string; user: any }>('/auth/login', { email, password });
+    return res.data;
+  },
+
+  register: async (payload: { name: string; email: string; password: string; role?: string; department?: string }) => {
+    const res = await client.post<{ access_token: string; token_type: string; user: any }>('/auth/register', payload);
+    return res.data;
+  },
+
+  getMe: async () => {
+    const res = await client.get<any>('/auth/me');
+    return res.data;
+  },
+
   // Incidents CRUD
   getIncidents: async (params?: { status?: string; priority?: string; category?: string; search?: string }) => {
     const res = await client.get<{ incidents: Incident[]; total: number }>('/incidents', { params });

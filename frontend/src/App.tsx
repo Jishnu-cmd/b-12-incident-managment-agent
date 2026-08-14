@@ -8,13 +8,30 @@ import { CopilotChat } from './pages/CopilotChat';
 import { KnowledgeBaseAdmin } from './pages/KnowledgeBaseAdmin';
 import { EvaluationSuite } from './pages/EvaluationSuite';
 import { ToolSandbox } from './pages/ToolSandbox';
+import { Login } from './pages/Login';
 import { CreateIncidentModal } from './components/CreateIncidentModal';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import type { Incident } from './types';
 
-export function App() {
+function MainApp() {
+  const { user, loading } = useAuth();
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [selectedIncidentId, setSelectedIncidentId] = useState<string | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#070b14] flex items-center justify-center text-cyan-400 font-mono text-sm space-x-3">
+        <div className="w-5 h-5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
+        <span>Authenticating AetherPay Command Center Session...</span>
+      </div>
+    );
+  }
+
+  // Protected View: If not authenticated, render Login Screen
+  if (!user) {
+    return <Login />;
+  }
 
   const handleSelectIncident = (id: string) => {
     setSelectedIncidentId(id);
@@ -44,7 +61,7 @@ export function App() {
       {/* Main 3-Column Grid Layout */}
       <div className="flex-1 max-w-[1700px] w-full mx-auto flex items-start">
         
-        {/* Left Sidebar (Only Used Active Options) */}
+        {/* Left Sidebar */}
         <Sidebar
           activeTab={activeTab}
           setActiveTab={(tab) => {
@@ -93,7 +110,7 @@ export function App() {
           )}
         </main>
 
-        {/* Right Sidebar (Copilot + Activity + Top Services) */}
+        {/* Right Sidebar */}
         <RightSidebar
           onSelectIncident={handleSelectIncident}
           onNavigateTab={(tab) => {
@@ -124,6 +141,14 @@ export function App() {
       </footer>
 
     </div>
+  );
+}
+
+export function App() {
+  return (
+    <AuthProvider>
+      <MainApp />
+    </AuthProvider>
   );
 }
 

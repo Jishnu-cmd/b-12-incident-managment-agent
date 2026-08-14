@@ -1,5 +1,6 @@
 import React from 'react';
-import { ShieldAlert, Search, Bell, Activity, Wrench } from 'lucide-react';
+import { ShieldAlert, Search, Bell, Activity, Wrench, LogOut } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 interface HeaderProps {
   activeTab: string;
@@ -8,6 +9,12 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ setActiveTab }) => {
+  const { user, logout } = useAuth();
+
+  const userInitials = user?.name
+    ? user.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)
+    : 'AM';
+
   return (
     <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#070b14]/95 border-b border-slate-800/80 px-6 py-2.5 shadow-xl shadow-black/40">
       <div className="max-w-[1700px] mx-auto flex items-center justify-between gap-4">
@@ -89,15 +96,23 @@ export const Header: React.FC<HeaderProps> = ({ setActiveTab }) => {
             </button>
           </div>
 
-          {/* User Profile Avatar for AetherPay */}
-          <div className="flex items-center space-x-2.5 border-l border-slate-800 pl-3">
+          {/* User Profile Avatar for AetherPay + Logout */}
+          <div className="flex items-center space-x-3 border-l border-slate-800 pl-3">
             <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white font-bold text-xs flex items-center justify-center shadow-md">
-              AM
+              {userInitials}
             </div>
             <div className="hidden md:block text-left">
-              <div className="text-xs font-bold text-white">Alex Mercer</div>
-              <div className="text-[10px] text-slate-400">AetherPay Lead SRE</div>
+              <div className="text-xs font-bold text-white">{user?.name || 'Alex Mercer'}</div>
+              <div className="text-[10px] text-slate-400">{user?.role || 'Incident Manager'}</div>
             </div>
+
+            <button
+              onClick={logout}
+              title="Sign Out of Command Center"
+              className="p-2 rounded-xl text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 border border-rose-500/30 transition-all"
+            >
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
 
         </div>

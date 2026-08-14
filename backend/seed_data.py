@@ -14,22 +14,39 @@ if root_dir not in sys.path:
 from app.core.database import SessionLocal, engine, Base
 from app.models.database import User, Incident, AIAnalysis, IncidentEvidence, RemediationAction, KnowledgeDocument
 from app.rag.vector_store import vector_store
+from app.core.security import get_password_hash
 
 def seed_database():
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
 
     try:
-        # 1. Fake Company Users: AetherPay Global Inc.
+        # 1. Fake Company Users: AetherPay Global Inc. with Default Passwords
         u_admin = db.query(User).filter(User.email == "admin@aetherpay.com").first()
         if not u_admin:
-            u_admin = User(name="Alex Mercer", email="admin@aetherpay.com", role="Incident Manager", department="Platform Ops")
+            u_admin = User(
+                name="Alex Mercer", 
+                email="admin@aetherpay.com", 
+                hashed_password=get_password_hash("admin123"),
+                role="Incident Manager", 
+                department="Platform Ops"
+            )
             db.add(u_admin)
+        else:
+            u_admin.hashed_password = get_password_hash("admin123")
 
         u_engineer = db.query(User).filter(User.email == "sre@aetherpay.com").first()
         if not u_engineer:
-            u_engineer = User(name="Elena Rostova", email="sre@aetherpay.com", role="Lead SRE", department="Site Reliability")
+            u_engineer = User(
+                name="Elena Rostova", 
+                email="sre@aetherpay.com", 
+                hashed_password=get_password_hash("sre123"),
+                role="Lead SRE", 
+                department="Site Reliability"
+            )
             db.add(u_engineer)
+        else:
+            u_engineer.hashed_password = get_password_hash("sre123")
 
         db.commit()
 
@@ -225,7 +242,7 @@ def seed_database():
                 db.add(rem)
                 db.commit()
 
-        print("[AetherPay Seed] Database populated with AetherPay Global Inc. microservices, SOPs, and incidents!")
+        print("[AetherPay Seed] Database populated with seed user passwords (admin@aetherpay.com / admin123, sre@aetherpay.com / sre123)!")
 
     finally:
         db.close()

@@ -9,7 +9,8 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String(100), nullable=False)
     email = Column(String(120), unique=True, nullable=False, index=True)
-    role = Column(String(50), nullable=False, default="Engineer") # Admin, Incident Manager, Engineer, Service Desk, Viewer
+    hashed_password = Column(String(200), nullable=True)
+    role = Column(String(50), nullable=False, default="Engineer") # Admin, Incident Manager, Engineer, Lead SRE, Service Desk, Viewer
     department = Column(String(100), nullable=True, default="IT Operations")
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
 
