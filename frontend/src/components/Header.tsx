@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldAlert, Search, Bell, Settings, Activity } from 'lucide-react';
+import { ShieldAlert, Search, Bell, Activity, Wrench } from 'lucide-react';
 
 interface HeaderProps {
   activeTab: string;
@@ -20,11 +20,16 @@ export const Header: React.FC<HeaderProps> = ({ setActiveTab }) => {
             </div>
           </div>
           <div>
-            <h1 className="text-base font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-slate-300">
-              AI INCIDENT AGENT
-            </h1>
+            <div className="flex items-center space-x-2">
+              <h1 className="text-base font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-white via-slate-100 to-slate-300">
+                AI INCIDENT AGENT
+              </h1>
+              <span className="px-2 py-0.5 text-[9px] font-bold font-mono tracking-wider rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                AetherPay Global Inc.
+              </span>
+            </div>
             <p className="text-[10px] text-slate-400 font-medium">
-              Autonomous Incident Response Command Center
+              Enterprise Autonomous Command Center
             </p>
           </div>
         </div>
@@ -35,7 +40,7 @@ export const Header: React.FC<HeaderProps> = ({ setActiveTab }) => {
             <Search className="w-3.5 h-3.5 absolute left-3 top-2.5 text-slate-400" />
             <input
               type="text"
-              placeholder="Search incidents, services, logs, docs..."
+              placeholder="Search AetherPay incidents, services, logs, SOPs..."
               className="w-full pl-9 pr-12 py-1.5 text-xs glass-input rounded-xl focus:ring-1 focus:ring-cyan-500"
             />
             <kbd className="absolute right-3 top-2 px-1.5 py-0.5 text-[9px] font-mono font-semibold text-slate-400 bg-slate-800 rounded border border-slate-700">
@@ -50,7 +55,7 @@ export const Header: React.FC<HeaderProps> = ({ setActiveTab }) => {
           {/* System Status Operational */}
           <div className="hidden lg:flex items-center space-x-2 px-3 py-1 rounded-xl bg-slate-900/90 border border-slate-800 text-xs">
             <Activity className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
-            <span className="text-[11px] text-slate-400">System Status:</span>
+            <span className="text-[11px] text-slate-400">Status:</span>
             <span className="text-[11px] font-bold text-emerald-400">Operational</span>
           </div>
 
@@ -66,31 +71,32 @@ export const Header: React.FC<HeaderProps> = ({ setActiveTab }) => {
             <span className="text-[11px] font-bold text-purple-300 font-mono">91.2%</span>
           </div>
 
-          {/* Notifications & Settings Icons */}
+          {/* Notifications & Tool Sandbox Shortcut */}
           <div className="flex items-center space-x-2">
+            <button 
+              onClick={() => setActiveTab('sandbox')}
+              title="Open MCP Tool Sandbox"
+              className="p-2 rounded-xl text-amber-400 bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/20 transition-all flex items-center space-x-1"
+            >
+              <Wrench className="w-4 h-4" />
+            </button>
+
             <button className="relative p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors">
               <Bell className="w-4 h-4" />
               <span className="absolute top-1 right-1 w-3.5 h-3.5 rounded-full bg-amber-500 text-[9px] font-bold text-slate-950 flex items-center justify-center">
                 3
               </span>
             </button>
-
-            <button 
-              onClick={() => setActiveTab('settings')}
-              className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors"
-            >
-              <Settings className="w-4 h-4" />
-            </button>
           </div>
 
-          {/* User Profile Avatar */}
+          {/* User Profile Avatar for AetherPay */}
           <div className="flex items-center space-x-2.5 border-l border-slate-800 pl-3">
             <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white font-bold text-xs flex items-center justify-center shadow-md">
-              AD
+              AM
             </div>
             <div className="hidden md:block text-left">
-              <div className="text-xs font-bold text-white">Admin</div>
-              <div className="text-[10px] text-slate-400">Incident Manager</div>
+              <div className="text-xs font-bold text-white">Alex Mercer</div>
+              <div className="text-[10px] text-slate-400">AetherPay Lead SRE</div>
             </div>
           </div>
 

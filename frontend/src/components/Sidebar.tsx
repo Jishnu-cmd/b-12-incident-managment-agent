@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
-  LayoutDashboard, ShieldAlert, Bot, Database, Eye, ChevronDown, 
-  Wrench, Network, BarChart3, Bell, Settings
+  LayoutDashboard, ShieldAlert, Bot, Database, 
+  Wrench, BarChart3
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -11,24 +11,24 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, incidentCount = 5 }) => {
+  // Only keep active, fully functional navigation items
   const navItems = [
     { id: 'dashboard', label: 'Command Dashboard', icon: LayoutDashboard },
-    { id: 'incidents', label: 'Incidents', icon: ShieldAlert, badge: incidentCount },
-    { id: 'copilot', label: 'AI Copilot', icon: Bot },
-    { id: 'knowledge', label: 'Knowledge Base', icon: Database },
-    { id: 'observability', label: 'Observability', icon: Eye, hasDropdown: true },
-    { id: 'sandbox', label: 'Automation', icon: Wrench },
-    { id: 'cmdb', label: 'CMDB Topology', icon: Network },
-    { id: 'evaluation', label: 'Reports & Analytics', icon: BarChart3 },
-    { id: 'alerts', label: 'Alerts', icon: Bell, badge: 12 },
-    { id: 'settings', label: 'Settings', icon: Settings },
+    { id: 'incidents', label: 'Incidents Queue', icon: ShieldAlert, badge: incidentCount },
+    { id: 'copilot', label: 'AI Copilot Assistant', icon: Bot },
+    { id: 'knowledge', label: 'RAG Knowledge Base', icon: Database },
+    { id: 'sandbox', label: 'MCP Tool Sandbox', icon: Wrench },
+    { id: 'evaluation', label: 'Evaluation Suite', icon: BarChart3 },
   ];
 
   return (
     <aside className="w-64 glass-panel border-r border-slate-800/80 p-4 flex flex-col justify-between hidden lg:flex min-h-[calc(100vh-65px)]">
       
-      {/* Navigation List */}
+      {/* Active Functional Navigation List */}
       <div className="space-y-1">
+        <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest px-3 mb-2">
+          Navigation Control
+        </div>
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id || (item.id === 'incidents' && activeTab === 'incident-detail');
@@ -48,16 +48,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, incid
                 <span>{item.label}</span>
               </div>
 
-              <div className="flex items-center space-x-1.5">
-                {item.badge !== undefined && (
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
-                    isActive ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-300'
-                  }`}>
-                    {item.badge}
-                  </span>
-                )}
-                {item.hasDropdown && <ChevronDown className="w-3.5 h-3.5 text-slate-500" />}
-              </div>
+              {item.badge !== undefined && (
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-mono font-bold ${
+                  isActive ? 'bg-emerald-500 text-slate-950' : 'bg-slate-800 text-slate-300'
+                }`}>
+                  {item.badge}
+                </span>
+              )}
             </button>
           );
         })}
@@ -130,14 +127,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, incid
               <span>Log Analyzer</span>
             </span>
             <span className="text-[10px] text-amber-400 font-mono">Warning</span>
-          </div>
-
-          <div className="flex items-center justify-between text-slate-300">
-            <span className="flex items-center space-x-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              <span>CMDB Sync</span>
-            </span>
-            <span className="text-[10px] text-emerald-400 font-mono">Healthy</span>
           </div>
         </div>
 
