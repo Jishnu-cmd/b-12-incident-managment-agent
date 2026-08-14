@@ -11,7 +11,6 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, incidentCount = 5 }) => {
-  // Only keep active, fully functional navigation items
   const navItems = [
     { id: 'dashboard', label: 'Command Dashboard', icon: LayoutDashboard },
     { id: 'incidents', label: 'Incidents Queue', icon: ShieldAlert, badge: incidentCount },
@@ -22,7 +21,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, incid
   ];
 
   return (
-    <aside className="w-64 glass-panel border-r border-slate-800/80 p-4 flex flex-col justify-between hidden lg:flex min-h-[calc(100vh-65px)]">
+    <aside className="w-64 glass-panel border-r border-slate-800/80 p-4 flex flex-col justify-between hidden lg:flex sticky top-[57px] h-[calc(100vh-57px)] overflow-y-auto">
       
       {/* Active Functional Navigation List */}
       <div className="space-y-1">

@@ -10,7 +10,7 @@ interface RightSidebarProps {
 export const RightSidebar: React.FC<RightSidebarProps> = ({ onNavigateTab }) => {
   const [input, setInput] = useState('');
   const [chatLog, setChatLog] = useState<Array<{ text: string; isUser: boolean }>>([
-    { text: 'Hello Admin! 👋 How can I assist you today?', isUser: false }
+    { text: 'Hello Alex! 👋 How can I assist you today?', isUser: false }
   ]);
   const [loading, setLoading] = useState(false);
 
@@ -33,7 +33,7 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ onNavigateTab }) => 
   };
 
   return (
-    <aside className="w-80 glass-panel border-l border-slate-800/80 p-4 space-y-5 hidden xl:flex flex-col min-h-[calc(100vh-65px)]">
+    <aside className="w-80 glass-panel border-l border-slate-800/80 p-4 space-y-5 hidden xl:flex flex-col sticky top-[57px] h-[calc(100vh-57px)] overflow-y-auto">
       
       {/* 1. AI COPILOT Widget */}
       <div className="glass-card rounded-2xl p-4 border border-indigo-500/20 space-y-3 relative overflow-hidden">
@@ -196,7 +196,7 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ onNavigateTab }) => 
         <div className="space-y-2.5 text-xs">
           <div>
             <div className="flex items-center justify-between text-[11px] mb-1">
-              <span className="font-semibold text-slate-200">Payment Gateway</span>
+              <span className="font-semibold text-slate-200">Payment Gateway API</span>
               <span className="font-mono font-bold text-rose-400">3</span>
             </div>
             <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
@@ -216,7 +216,7 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ onNavigateTab }) => 
 
           <div>
             <div className="flex items-center justify-between text-[11px] mb-1">
-              <span className="font-semibold text-slate-200">Mail Service</span>
+              <span className="font-semibold text-slate-200">Auth Token Authority</span>
               <span className="font-mono font-bold text-yellow-400">1</span>
             </div>
             <div className="w-full h-1.5 rounded-full bg-slate-800 overflow-hidden">
@@ -236,7 +236,7 @@ export const RightSidebar: React.FC<RightSidebarProps> = ({ onNavigateTab }) => 
         </div>
 
         <button 
-          onClick={() => onNavigateTab && onNavigateTab('cmdb')}
+          onClick={() => onNavigateTab && onNavigateTab('incidents')}
           className="w-full text-center text-[11px] font-semibold text-indigo-400 hover:text-indigo-300 pt-1 flex items-center justify-center space-x-1"
         >
           <span>View All Services</span>

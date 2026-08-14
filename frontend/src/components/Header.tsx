@@ -9,7 +9,7 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ setActiveTab }) => {
   return (
-    <header className="sticky top-0 z-40 glass-panel border-b border-slate-800/80 px-6 py-2.5">
+    <header className="sticky top-0 z-50 backdrop-blur-xl bg-[#070b14]/95 border-b border-slate-800/80 px-6 py-2.5 shadow-xl shadow-black/40">
       <div className="max-w-[1700px] mx-auto flex items-center justify-between gap-4">
         
         {/* Left: Logo & Subtitle */}
