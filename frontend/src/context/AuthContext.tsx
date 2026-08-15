@@ -1,72 +1,92 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useUser, useAuth as useClerkAuth, useClerk } from '@clerk/clerk-react';
 import { api } from '../services/api';
 
 export interface UserProfile {
   id: number;
+  clerk_user_id: string;
   name: string;
   email: string;
+  phone_number?: string;
   role: string;
   department: string;
 }
 
 interface AuthContextType {
   user: UserProfile | null;
-  token: string | null;
-  loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string, role?: string, department?: string) => Promise<void>;
-  logout: () => void;
+  clerkUser: any;
+  isSignedIn: boolean;
+  isLoaded: boolean;
+  syncUser: () => Promise<void>;
+  logout: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<UserProfile | null>(null);
-  const [token, setToken] = useState<string | null>(localStorage.getItem('aetherpay_token'));
-  const [loading, setLoading] = useState(true);
+  const { user: clerkUser, isLoaded, isSignedIn } = useUser();
+  const { signOut } = useClerkAuth();
+  const { signOut: clerkSignOut } = useClerk();
+  const [dbUser, setDbUser] = useState<UserProfile | null>(null);
+
+  const syncUser = async () => {
+    if (isSignedIn && clerkUser) {
+      const email = clerkUser.primaryEmailAddress?.emailAddress || clerkUser.emailAddresses[0]?.emailAddress || '';
+      const phoneNumber = clerkUser.primaryPhoneNumber?.phoneNumber || clerkUser.phoneNumbers[0]?.phoneNumber || '';
+      const name = clerkUser.fullName || clerkUser.firstName || email.split('@')[0];
+
+      try {
+        const synced = await api.syncClerkUser({
+          clerk_user_id: clerkUser.id,
+          email: email,
+          name: name,
+          phone_number: phoneNumber,
+          role: (clerkUser.publicMetadata?.role as string) || 'Lead SRE'
+        });
+        setDbUser(synced);
+      } catch (err) {
+        console.error('Clerk user DB sync failed', err);
+      }
+    } else {
+      setDbUser(null);
+    }
+  };
 
   useEffect(() => {
-    const initAuth = async () => {
-      const storedToken = localStorage.getItem('aetherpay_token');
-      if (storedToken) {
-        try {
-          const profile = await api.getMe();
-          setUser(profile);
-          setToken(storedToken);
-        } catch (err) {
-          console.error('Session expired', err);
-          localStorage.removeItem('aetherpay_token');
-          setToken(null);
-          setUser(null);
-        }
-      }
-      setLoading(false);
-    };
-    initAuth();
-  }, []);
+    if (isLoaded) {
+      syncUser();
+    }
+  }, [isLoaded, isSignedIn, clerkUser]);
 
-  const login = async (email: string, password: string) => {
-    const res = await api.login(email, password);
-    localStorage.setItem('aetherpay_token', res.access_token);
-    setToken(res.access_token);
-    setUser(res.user);
+  const logout = async () => {
+    try {
+      await signOut();
+      await clerkSignOut();
+      setDbUser(null);
+    } catch (err) {
+      console.error('Logout error', err);
+    }
   };
 
-  const register = async (name: string, email: string, password: string, role?: string, department?: string) => {
-    const res = await api.register({ name, email, password, role, department });
-    localStorage.setItem('aetherpay_token', res.access_token);
-    setToken(res.access_token);
-    setUser(res.user);
-  };
-
-  const logout = () => {
-    localStorage.removeItem('aetherpay_token');
-    setToken(null);
-    setUser(null);
-  };
+  const activeUser: UserProfile | null = clerkUser ? {
+    id: dbUser?.id || 1,
+    clerk_user_id: clerkUser.id,
+    name: clerkUser.fullName || clerkUser.firstName || dbUser?.name || 'AetherPay User',
+    email: clerkUser.primaryEmailAddress?.emailAddress || dbUser?.email || '',
+    phone_number: clerkUser.primaryPhoneNumber?.phoneNumber || dbUser?.phone_number || '',
+    role: dbUser?.role || 'Lead SRE',
+    department: dbUser?.department || 'AetherPay Enterprise'
+  } : null;
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ 
+      user: activeUser, 
+      clerkUser, 
+      isSignedIn: !!isSignedIn, 
+      isLoaded, 
+      syncUser, 
+      logout 
+    }}>
       {children}
     </AuthContext.Provider>
   );

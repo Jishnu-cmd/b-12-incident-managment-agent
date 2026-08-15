@@ -1,7 +1,7 @@
 import axios from 'axios';
 import type { Incident, KnowledgeDocument, EvaluationMetrics } from '../types';
 
-const API_BASE = 'http://127.0.0.1:8008/api';
+const API_BASE = 'http://127.0.0.1:8009/api';
 
 const client = axios.create({
   baseURL: API_BASE,
@@ -10,7 +10,7 @@ const client = axios.create({
   },
 });
 
-// Interceptor to attach JWT token if present
+// Interceptor to attach JWT / Clerk session token if present
 client.interceptors.request.use((config) => {
   const token = localStorage.getItem('aetherpay_token');
   if (token) {
@@ -20,7 +20,18 @@ client.interceptors.request.use((config) => {
 });
 
 export const api = {
-  // Auth API
+  // Clerk Sync & Auth API
+  syncClerkUser: async (payload: {
+    clerk_user_id: string;
+    email: string;
+    name?: string;
+    phone_number?: string;
+    role?: string;
+  }) => {
+    const res = await client.post<any>('/auth/clerk-sync', payload);
+    return res.data;
+  },
+
   login: async (email: string, password: string) => {
     const res = await client.post<{ access_token: string; token_type: string; user: any }>('/auth/login', { email, password });
     return res.data;

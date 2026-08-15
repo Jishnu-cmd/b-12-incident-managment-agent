@@ -21,17 +21,81 @@ class RegisterRequest(BaseModel):
     role: Optional[str] = "Engineer"
     department: Optional[str] = "IT Operations"
 
+class ClerkSyncRequest(BaseModel):
+    clerk_user_id: str
+    email: str
+    name: Optional[str] = "AetherPay User"
+    phone_number: Optional[str] = None
+    role: Optional[str] = "Lead SRE"
+
 class UserResponse(BaseModel):
     id: int
+    clerk_user_id: Optional[str] = None
     name: str
     email: str
+    phone_number: Optional[str] = None
     role: str
-    department: str
+    department: Optional[str] = "Platform Operations"
 
 class AuthTokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
     user: UserResponse
+
+@router.post("/clerk-sync", response_model=UserResponse)
+def sync_clerk_user(payload: ClerkSyncRequest, db: Session = Depends(get_db)):
+    """Synchronize Clerk authenticated user with SQLite backend database."""
+    user = db.query(User).filter(
+        (User.clerk_user_id == payload.clerk_user_id) | (User.email == payload.email)
+    ).first()
+
+    now = datetime.datetime.utcnow()
+
+    if not user:
+        user = User(
+            clerk_user_id=payload.clerk_user_id,
+            name=payload.name or payload.email.split("@")[0].capitalize(),
+            email=payload.email,
+            phone_number=payload.phone_number,
+            role=payload.role or "Lead SRE",
+            department="AetherPay Enterprise",
+            last_login_at=now
+        )
+        db.add(user)
+        db.commit()
+        db.refresh(user)
+
+        db.add(AuditLog(
+            user_id=user.id,
+            action="CLERK_USER_CREATED",
+            details=f"Created user from Clerk Auth: {user.email} (Phone: {user.phone_number or 'N/A'})."
+        ))
+        db.commit()
+    else:
+        user.clerk_user_id = payload.clerk_user_id
+        if payload.phone_number:
+            user.phone_number = payload.phone_number
+        if payload.name:
+            user.name = payload.name
+        user.last_login_at = now
+
+        db.add(AuditLog(
+            user_id=user.id,
+            action="CLERK_USER_LOGGED_IN",
+            details=f"User verified via Clerk OTP: {user.email} (ID: {payload.clerk_user_id})."
+        ))
+        db.commit()
+        db.refresh(user)
+
+    return {
+        "id": user.id,
+        "clerk_user_id": user.clerk_user_id,
+        "name": user.name,
+        "email": user.email,
+        "phone_number": user.phone_number,
+        "role": user.role,
+        "department": user.department or "Platform Operations"
+    }
 
 @router.post("/login", response_model=AuthTokenResponse)
 def login(payload: LoginRequest, db: Session = Depends(get_db)):
@@ -63,8 +127,10 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
         "token_type": "bearer",
         "user": {
             "id": user.id,
+            "clerk_user_id": user.clerk_user_id,
             "name": user.name,
             "email": user.email,
+            "phone_number": user.phone_number,
             "role": user.role,
             "department": user.department or "AetherPay Operations"
         }
@@ -105,8 +171,10 @@ def register(payload: RegisterRequest, db: Session = Depends(get_db)):
         "token_type": "bearer",
         "user": {
             "id": user.id,
+            "clerk_user_id": user.clerk_user_id,
             "name": user.name,
             "email": user.email,
+            "phone_number": user.phone_number,
             "role": user.role,
             "department": user.department
         }
@@ -138,8 +206,10 @@ def get_current_user(authorization: Optional[str] = Header(None), db: Session = 
 
     return {
         "id": user.id,
+        "clerk_user_id": user.clerk_user_id,
         "name": user.name,
         "email": user.email,
+        "phone_number": user.phone_number,
         "role": user.role,
         "department": user.department or "Platform Operations"
     }

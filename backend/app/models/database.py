@@ -7,12 +7,15 @@ class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, index=True)
+    clerk_user_id = Column(String(100), nullable=True, unique=True, index=True)
     name = Column(String(100), nullable=False)
     email = Column(String(120), unique=True, nullable=False, index=True)
+    phone_number = Column(String(30), nullable=True)
     hashed_password = Column(String(200), nullable=True)
     role = Column(String(50), nullable=False, default="Engineer") # Admin, Incident Manager, Engineer, Lead SRE, Service Desk, Viewer
     department = Column(String(100), nullable=True, default="IT Operations")
     created_at = Column(DateTime, default=datetime.datetime.utcnow)
+    last_login_at = Column(DateTime, default=datetime.datetime.utcnow)
 
 class Incident(Base):
     __tablename__ = "incidents"

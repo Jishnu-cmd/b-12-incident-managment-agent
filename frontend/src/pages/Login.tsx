@@ -1,51 +1,12 @@
 import React, { useState } from 'react';
-import { ShieldAlert, Mail, User, Lock, ArrowRight, ShieldCheck } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import { SignIn, SignUp } from '@clerk/clerk-react';
+import { ShieldAlert, ShieldCheck } from 'lucide-react';
 
 export const Login: React.FC = () => {
-  const { login, register } = useAuth();
-  const [isRegistering, setIsRegistering] = useState(false);
-  const [email, setEmail] = useState('admin@aetherpay.com');
-  const [password, setPassword] = useState('admin123');
-  const [name, setName] = useState('');
-  const [role, setRole] = useState('Lead SRE');
-  const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setSubmitting(true);
-
-    try {
-      if (isRegistering) {
-        await register(name, email, password, role, 'AetherPay Operations');
-      } else {
-        await login(email, password);
-      }
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Authentication failed. Please check your credentials.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleQuickLogin = async (demoEmail: string, demoPass: string) => {
-    setEmail(demoEmail);
-    setPassword(demoPass);
-    setError(null);
-    setSubmitting(true);
-    try {
-      await login(demoEmail, demoPass);
-    } catch (err: any) {
-      setError(err.response?.data?.detail || 'Demo login failed');
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  const [isSignUp, setIsSignUp] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#070b14] text-slate-100 flex items-center justify-center p-4 selection:bg-indigo-500 selection:text-white">
+    <div className="min-h-screen bg-[#070b14] text-slate-100 flex flex-col items-center justify-center p-4 selection:bg-indigo-500 selection:text-white">
       
       {/* Background Ambient Glow */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden">
@@ -53,7 +14,7 @@ export const Login: React.FC = () => {
         <div className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-indigo-500/10 blur-3xl animate-pulse" style={{ animationDuration: '6s' }} />
       </div>
 
-      <div className="w-full max-w-md glass-panel rounded-3xl p-8 border border-slate-800 space-y-6 relative z-10 shadow-2xl">
+      <div className="w-full max-w-md space-y-6 relative z-10">
         
         {/* Header Branding */}
         <div className="text-center space-y-2">
@@ -67,146 +28,75 @@ export const Login: React.FC = () => {
             AI Incident Agent Command Center
           </h1>
           <p className="text-xs text-slate-400 font-medium">
-            AetherPay Global Inc. Enterprise Authentication
+            AetherPay Global Inc. Enterprise Authentication (Clerk OTP)
           </p>
         </div>
 
-        {/* Quick Demo Login Credentials Bar */}
-        <div className="bg-slate-900/80 p-3 rounded-2xl border border-slate-800 space-y-2">
-          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest flex items-center space-x-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Quick Enterprise Login</span>
+        {/* Verification Info Badge */}
+        <div className="glass-panel p-3.5 rounded-2xl border border-slate-800 text-xs space-y-1 text-slate-300">
+          <div className="flex items-center space-x-1.5 text-emerald-400 font-bold uppercase tracking-wider text-[10px]">
+            <ShieldCheck className="w-4 h-4" />
+            <span>Clerk User Verification</span>
           </div>
-
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => handleQuickLogin('admin@aetherpay.com', 'admin123')}
-              className="px-2.5 py-1.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/30 text-[10px] font-bold transition-all text-left truncate"
-            >
-              👑 Alex Mercer (Manager)
-            </button>
-            <button
-              type="button"
-              onClick={() => handleQuickLogin('sre@aetherpay.com', 'sre123')}
-              className="px-2.5 py-1.5 rounded-xl bg-cyan-600/20 hover:bg-cyan-600/40 text-cyan-300 border border-cyan-500/30 text-[10px] font-bold transition-all text-left truncate"
-            >
-              ⚡ Elena Rostova (Lead SRE)
-            </button>
-          </div>
+          <p className="text-[11px] text-slate-400 leading-relaxed">
+            Every user registration and login requires <strong className="text-cyan-300">Email OTP</strong> or <strong className="text-cyan-300">Phone Number SMS OTP</strong> verification. All logins are persistently saved to database.
+          </p>
         </div>
 
-        {/* Tab Toggle: Login vs Register */}
+        {/* Toggle Mode Bar */}
         <div className="flex items-center justify-center p-1 rounded-xl bg-slate-900 border border-slate-800 text-xs">
           <button
             type="button"
-            onClick={() => setIsRegistering(false)}
-            className={`flex-1 py-1.5 rounded-lg font-bold transition-all ${
-              !isRegistering ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
+            onClick={() => setIsSignUp(false)}
+            className={`flex-1 py-2 rounded-lg font-bold transition-all ${
+              !isSignUp ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
             }`}
           >
-            Sign In
+            Sign In with OTP
           </button>
           <button
             type="button"
-            onClick={() => setIsRegistering(true)}
-            className={`flex-1 py-1.5 rounded-lg font-bold transition-all ${
-              isRegistering ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
+            onClick={() => setIsSignUp(true)}
+            className={`flex-1 py-2 rounded-lg font-bold transition-all ${
+              isSignUp ? 'bg-indigo-600 text-white shadow-md' : 'text-slate-400 hover:text-white'
             }`}
           >
-            Register Account
+            Register (Clerk OTP)
           </button>
         </div>
 
-        {/* Error Callout */}
-        {error && (
-          <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs font-medium">
-            {error}
-          </div>
-        )}
-
-        {/* Authentication Form */}
-        <form onSubmit={handleSubmit} className="space-y-4">
-          
-          {isRegistering && (
-            <div>
-              <label className="block text-xs text-slate-300 mb-1">Full Name</label>
-              <div className="relative">
-                <User className="w-4 h-4 absolute left-3 top-2.5 text-slate-500" />
-                <input
-                  type="text"
-                  placeholder="e.g. Marcus Vance"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  className="w-full pl-9 pr-3.5 py-2 text-xs glass-input rounded-xl"
-                  required
-                />
-              </div>
-            </div>
+        {/* Clerk Auth Embedded UI Box */}
+        <div className="flex justify-center">
+          {!isSignUp ? (
+            <SignIn 
+              appearance={{
+                elements: {
+                  card: 'glass-panel bg-[#0b1329]/90 border border-slate-800 shadow-2xl rounded-3xl p-6 text-white',
+                  headerTitle: 'text-white text-lg font-extrabold',
+                  headerSubtitle: 'text-slate-400 text-xs',
+                  socialButtonsBlockButton: 'bg-slate-900 border border-slate-800 text-white hover:bg-slate-800',
+                  formButtonPrimary: 'bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold rounded-xl py-2.5',
+                  formFieldInput: 'glass-input bg-slate-900 border border-slate-800 text-white rounded-xl',
+                  footerActionLink: 'text-cyan-400 hover:text-cyan-300'
+                }
+              }}
+            />
+          ) : (
+            <SignUp 
+              appearance={{
+                elements: {
+                  card: 'glass-panel bg-[#0b1329]/90 border border-slate-800 shadow-2xl rounded-3xl p-6 text-white',
+                  headerTitle: 'text-white text-lg font-extrabold',
+                  headerSubtitle: 'text-slate-400 text-xs',
+                  socialButtonsBlockButton: 'bg-slate-900 border border-slate-800 text-white hover:bg-slate-800',
+                  formButtonPrimary: 'bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-bold rounded-xl py-2.5',
+                  formFieldInput: 'glass-input bg-slate-900 border border-slate-800 text-white rounded-xl',
+                  footerActionLink: 'text-cyan-400 hover:text-cyan-300'
+                }
+              }}
+            />
           )}
-
-          <div>
-            <label className="block text-xs text-slate-300 mb-1">Enterprise Email</label>
-            <div className="relative">
-              <Mail className="w-4 h-4 absolute left-3 top-2.5 text-slate-500" />
-              <input
-                type="email"
-                placeholder="name@aetherpay.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-9 pr-3.5 py-2 text-xs glass-input rounded-xl"
-                required
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs text-slate-300 mb-1">Password</label>
-            <div className="relative">
-              <Lock className="w-4 h-4 absolute left-3 top-2.5 text-slate-500" />
-              <input
-                type="password"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-9 pr-3.5 py-2 text-xs glass-input rounded-xl"
-                required
-              />
-            </div>
-          </div>
-
-          {isRegistering && (
-            <div>
-              <label className="block text-xs text-slate-300 mb-1">Team Role</label>
-              <select
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-                className="w-full px-3 py-2 text-xs glass-input rounded-xl bg-slate-900"
-              >
-                <option value="Lead SRE">Lead SRE</option>
-                <option value="Incident Manager">Incident Manager</option>
-                <option value="Engineer">DevOps / Software Engineer</option>
-                <option value="Service Desk">Service Desk Specialist</option>
-                <option value="Viewer">Operations Viewer</option>
-              </select>
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={submitting}
-            className="w-full flex items-center justify-center space-x-2 py-3 rounded-xl text-xs font-bold text-white bg-gradient-to-r from-cyan-500 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 shadow-lg shadow-indigo-600/30 transition-all transform active:scale-95"
-          >
-            {submitting ? (
-              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-            ) : (
-              <>
-                <span>{isRegistering ? 'Create AetherPay Account' : 'Authenticate & Enter Center'}</span>
-                <ArrowRight className="w-4 h-4" />
-              </>
-            )}
-          </button>
-        </form>
+        </div>
 
         <div className="text-center text-[11px] text-slate-500 pt-2 border-t border-slate-900">
           Vasireddy Venkatadri Institute of Technology (VVIT) • CSE AIML CSM-C12

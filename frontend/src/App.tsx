@@ -14,21 +14,21 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import type { Incident } from './types';
 
 function MainApp() {
-  const { user, loading } = useAuth();
+  const { user, isLoaded } = useAuth();
   const [activeTab, setActiveTab] = useState<string>('dashboard');
   const [selectedIncidentId, setSelectedIncidentId] = useState<string | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-  if (loading) {
+  if (!isLoaded) {
     return (
       <div className="min-h-screen bg-[#070b14] flex items-center justify-center text-cyan-400 font-mono text-sm space-x-3">
         <div className="w-5 h-5 border-2 border-cyan-400 border-t-transparent rounded-full animate-spin" />
-        <span>Authenticating AetherPay Command Center Session...</span>
+        <span>Authenticating Clerk OTP Session...</span>
       </div>
     );
   }
 
-  // Protected View: If not authenticated, render Login Screen
+  // Protected View: If not authenticated with Clerk, render Clerk Sign-In / Sign-Up
   if (!user) {
     return <Login />;
   }
